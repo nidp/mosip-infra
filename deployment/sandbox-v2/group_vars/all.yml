@@ -16,6 +16,7 @@ site:
   ssl:
     get_certificate: false  # get a fresh certificate for the domain using Letsencrypt.
     email: ''
+    certificate_dir: '/etc/cert/{{sandbox_domain_name}}'
     certificate: '/etc/cert/{{sandbox_domain_name}}/fullchain.pem'
     certificate_key: '/etc/cert/{{sandbox_domain_name}}/privkey.pem'
    

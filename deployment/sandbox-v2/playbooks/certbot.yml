@@ -1,0 +1,32 @@
+- hosts: nginxserver
+  roles:
+    - {role: packages/epel, tags: [epel]}
+    - {role: nginx, when: site.ssl.get_certificate == false, tags: [nginx]} 
+    - {role: letsencrypt, when: site.ssl.get_certificate == false, tags: [letsencrypt]}
+  
+  tasks: 
+    - name: Ensure directory exists for local self-signed TLS certs.
+      file:
+        path: {{ site.ssl.certificate_dir }}
+        state: directory
+      become: yes
+
+    - name: Generate an OpenSSL private key.
+      openssl_privatekey:
+        path: {{ site.ssl.certificate_key }}
+      become: yes
+    
+    - name: Generate an OpenSSL CSR.
+      openssl_csr:
+        path: /etc/ssl/private/{{ sandbox_domain_name }}.csr
+        privatekey_path: {{ site.ssl.certificate_key }}
+        common_name: "{{ sandbox_domain_name }}"
+      become: yes
+
+    - name: Generate a Self Signed OpenSSL certificate.
+      openssl_certificate:
+        path: {{ site.ssl.certificate }}
+        privatekey_path: {{ site.ssl.certificate_key }}
+        csr_path: /etc/ssl/private/{{ sandbox_domain_name }}.csr
+        provider: selfsigned
+      become: yes
