@@ -11,6 +11,12 @@
         state: directory
       become: yes
 
+    - name: Ensure directory exists for local self-signed TLS certs.
+      file:
+        path: /etc/ssl/private
+        state: directory
+      become: yes
+
     - name: Generate an OpenSSL private key.
       openssl_privatekey:
         path: "{{ site.ssl.certificate_key }}"
